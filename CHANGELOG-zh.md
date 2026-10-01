@@ -5,6 +5,21 @@
 格式基于 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [1.40.3] - 2026-10-02
+
+### 发布概览
+- 修复备份永远无法同步、启动即退出、Windows 上 CLI 桥接始终装不上三个问题；preset 可编辑描述，命令行可注册自定义 Agent。
+
+### 用户可见更新
+- **git 使用新的 reftable 格式时，备份与同步恢复正常** — 如果你的 git 默认创建 reftable 仓库，技能库会以这种 Skills Manager 读不了的格式建出来：每次同步都失败，仓库看起来像坏了（`HEAD` 指向 `refs/heads/.invalid`）。新建的技能库现在固定使用传统格式；已经是 reftable 的库会给出明确提示和转换命令（需 Git 2.48+），自动备份也会报出错误，而不是悄悄停掉（#504）。
+- **同步元数据为空时不再启动即退出** — 如果技能库里的元数据一个技能都没列出、而技能文件夹还在，每次启动都会在窗口出现前退出（Windows 上没有任何提示）。现在只要应用数据库记录了全部技能文件夹，就会据此重建元数据并正常启动（#421）。
+- **Windows：CLI 桥接恢复安装** — 每次启动把内置的 `skills-manager-cli.exe` 放到位都会报「文件正被另一个进程使用」，原因是 Windows 会短暂锁住刚运行过的程序。现在会等锁释放后再放置（#487）。
+- **preset 可编辑描述** — 「重命名」改为「编辑」，可以设置或清空 preset 的描述，悬停在侧栏和 preset 栏上时显示（#498）。
+- **`skills-manager-cli agents add-custom`** — 可在命令行注册自定义 Agent。README 新增在 WSL 内运行 CLI、管理 WSL 中 Agent 的说明（#501）。
+
+### 开发者与治理更新
+- 同步元数据「未列出任何技能」的拒绝改为类型化错误（`EmptySkillMetadata`），启动流程只在这一种情况下自愈；备份同步后的重建索引仍然硬失败。
+- GUI 命令与 CLI 共用 `add_custom_tool_internal`。
 ## [1.40.2] - 2026-09-30
 
 ### 发布概览

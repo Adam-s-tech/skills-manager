@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.40.3] - 2026-10-02
+
+### Release Overview
+- Fixes for backups that could never sync, an app that quit at launch, and a CLI bridge that never installed on Windows; presets get editable descriptions, and the CLI can register custom agents.
+
+### User-facing
+- **Backup and sync work when git uses its newer "reftable" format** — If your git is set to create reftable repositories, the skills library was created in that format, which Skills Manager cannot read: every sync failed and the repository looked broken (`HEAD` pointing at `refs/heads/.invalid`). New libraries now always use the classic format. An existing reftable library gets a clear message with the command to convert it (Git 2.48+), and automatic backup reports it instead of stopping silently (#504).
+- **The app no longer quits at launch when its sync metadata is empty** — If the metadata in the library listed no skills while skill folders existed, every launch stopped before showing a window (silently on Windows). When the app's database still accounts for every skill folder, the metadata is now rebuilt from it and the app starts normally (#421).
+- **Windows: the CLI bridge installs again** — Copying the bundled `skills-manager-cli.exe` into place failed on every launch with "the file is being used by another process", because Windows briefly keeps a just-run program locked. The app now waits that out (#487).
+- **Presets have an editable description** — "Rename" is now "Edit": you can set or clear a preset's description, shown when hovering the preset in the sidebar and preset bar (#498).
+- **`skills-manager-cli agents add-custom`** — Register a custom agent from the command line. The README has a new section on running the CLI inside WSL to manage agents installed there (#501).
+
+### Developer & Governance
+- Sync metadata's "no skills listed" refusal is a typed error (`EmptySkillMetadata`), so startup can recover from that case alone; the reindex after a backup sync still fails hard.
+- `add_custom_tool_internal` is shared by the GUI command and the CLI.
 ## [1.40.2] - 2026-09-30
 
 ### Release Overview
